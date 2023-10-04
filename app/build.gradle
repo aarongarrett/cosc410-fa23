@@ -1,0 +1,87 @@
+plugins {
+    id 'application'
+    id 'jacoco'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.3'
+    testImplementation 'org.hamcrest:hamcrest:2.2'
+    testImplementation 'io.cucumber:cucumber-junit:7.14.0'
+    testImplementation 'io.cucumber:cucumber-java:7.14.0'
+
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    implementation 'com.google.guava:guava:32.1.1-jre'
+    implementation 'org.glassfish:jakarta.json:2.0.1'
+    implementation 'info.picocli:picocli:4.7.5'
+    
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(11)
+    }
+}
+
+application {
+    mainClass = 'machiwoco.App'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+jacocoTestReport {
+    reports {
+        html {
+            enabled true
+        }
+    }
+}
+
+configurations {
+    cucumberRuntime {
+        extendsFrom testImplementation
+    }
+}
+
+task cucumber() {
+    dependsOn assemble, testClasses
+    doLast {
+        javaexec {
+            mainClass = 'io.cucumber.core.cli.Main'
+            classpath = configurations.cucumberRuntime + sourceSets.main.output + sourceSets.test.output
+            args = ['--plugin', 'pretty', '--plugin', 'html:build/reports/cucumber/index.html', '--glue', 'gradle.cucumber', 'src/test/resources']
+        }
+    }
+}
+
+
+tasks.withType(JavaCompile) {
+    options.compilerArgs += ['-proc:none', '-Xlint:unchecked', '-Xlint:deprecation']
+}
+
+
+jar {
+    archiveBaseName = "machiwoco"
+    manifest {
+        attributes 'Main-Class': 'machiwoco.App'
+    }
+}
+
+javadoc {
+    options {
+        links 'https://docs.oracle.com/en/java/javase/11/docs/api/'
+    }
+}
+
+shadowJar {
+   archiveBaseName.set('machiwoco')
+   archiveClassifier.set('all')
+   archiveVersion.set('')
+}

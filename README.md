@@ -36,9 +36,6 @@ This repository has been set up to get you started in completing your capstone p
     + [Prerequisites](#prerequisites)
     + [Building the Project](#building-the-project)
     + [Directory Structure](#directory-structure)
-    + [IDE Setup](#ide-setup)
-      - [Intellij](#intellij)
-      - [Eclipse](#eclipse)
   * [Full Console Playthrough](#full-console-playthrough)
 
 
